@@ -22,29 +22,29 @@
 
 package linkedlist
 
-type Node[T any] struct {
-	val  T
-	next *Node[T]
-}
-<<<<<<< HEAD
-=======
+import (
+	"testing"
+)
 
-func (n *Node[T]) SetVal(v T) {
-	n.val = v
-}
-
-func (n *Node[T]) GetVal() T {
-	return n.val
-}
-
-func (n *Node[T]) SetNext(next *Node[T]) {
-	n.next = next
-}
-
-func (n *Node[T]) Next() *Node[T] {
-	if n == nil {
-		return nil
+func TestNode(t *testing.T) {
+	num := 100
+	nodes := make([]Node[int], num)
+	var i int
+	for i < num {
+		nodes[i].SetVal(i)
+		if i < num-1 {
+			nodes[i].SetNext(&nodes[i+1])
+		}
+		i++
 	}
-	return n.next
+
+	var exp int
+	cur := &nodes[0]
+	for cur != nil {
+		if v := cur.GetVal(); v != exp {
+			t.Fatalf("expected value of node to be %v, got: %v", exp, v)
+		}
+		exp++
+		cur = cur.Next()
+	}
 }
->>>>>>> 190e7a2 (linkedlist: Add package)
