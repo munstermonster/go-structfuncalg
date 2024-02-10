@@ -26,8 +26,6 @@ type Node[T any] struct {
 	val  T
 	next *Node[T]
 }
-<<<<<<< HEAD
-=======
 
 func (n *Node[T]) SetVal(v T) {
 	n.val = v
@@ -47,4 +45,3 @@ func (n *Node[T]) Next() *Node[T] {
 	}
 	return n.next
 }
->>>>>>> 190e7a2 (linkedlist: Add package)
