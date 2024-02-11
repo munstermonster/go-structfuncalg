@@ -24,7 +24,7 @@ import "testing"
 
 func TestCicular(t *testing.T) {
 	n := 10
-	c := NewCircular[int](n)
+	c := NewCircular[int](false, n)
 
 	if !c.IsEmpty() {
 		t.Fatalf("expected buffer to be empty, got: %v", c)

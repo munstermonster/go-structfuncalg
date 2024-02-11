@@ -24,21 +24,37 @@ import "fmt"
 
 // Circular implements a cicular buffer of type T where Push and Pop are FIFO
 type Circular[T any] struct {
-	head *int
-	tail *int
-	buf  []*T
+	overwrite bool
+	count     int
+	head      *int
+	tail      *int
+	buf       []*T
 }
 
 func (c Circular[T]) String() string {
-	return fmt.Sprintf("%v, %v, %v", *c.head, *c.tail, c.buf)
+	var s string
+	for _, v := range c.buf {
+		if v == nil {
+			s = s + fmt.Sprintf("nil, ")
+		} else {
+			s = s + fmt.Sprintf("%v, ", *v)
+		}
+	}
+	return fmt.Sprintf("%v, %v, %v", *c.head, *c.tail, s)
 }
 
-func NewCircular[T any](n int) Circular[T] {
-	return Circular[T]{buf: make([]*T, n)}
+func NewCircular[T any](overwrite bool, n int) Circular[T] {
+	return Circular[T]{overwrite: overwrite, buf: make([]*T, n)}
 }
 
 func (c *Circular[T]) Push(value T) bool {
-	if c.head == nil && c.tail == nil {
+	if c.IsFull() {
+		return false
+	}
+	if c.count != len(c.buf) {
+		c.count++
+	}
+	if c.IsEmpty() {
 		var a, b int
 		c.head = &a
 		c.tail = &b
@@ -46,9 +62,6 @@ func (c *Circular[T]) Push(value T) bool {
 		return true
 	}
 	idx := (*c.tail + 1) % len(c.buf)
-	if c.buf[idx] != nil {
-		return false
-	}
 	c.buf[idx] = &value
 	c.tail = &idx
 	return true
@@ -66,6 +79,7 @@ func (c *Circular[T]) Pop() (bool, T) {
 		c.head = nil
 		c.tail = nil
 	}
+	c.count--
 	return true, v
 }
 
@@ -89,10 +103,14 @@ func (c *Circular[T]) Rear() T {
 	return *c.buf[*c.tail]
 }
 
+func (c *Circular[T]) Size() int {
+	return c.count
+}
+
 func (c *Circular[T]) IsEmpty() bool {
 	return c.head == nil && c.tail == nil
 }
 
 func (c *Circular[T]) IsFull() bool {
-	return (*c.tail+1)%len(c.buf) == *c.head
+	return (*c.tail+1)%len(c.buf) == *c.head && !c.overwrite
 }
